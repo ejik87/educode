@@ -1,0 +1,28 @@
+{% extends "./base.html" %}
+{% block title %}Hyper news{% endblock %}
+{% block head %}Hyper news{% endblock %}
+{% block content %}
+<form action="{% url 'news_page' %}" method="GET">{% csrf_token %}
+    <p>Search News:
+        <label>
+            <input type="search" name="q" autofocus>
+        </label>
+        <button type="submit">search</button>
+    </p>
+</form>
+<!-- Resorting dict to group from date -->
+{% regroup news|dictsortreversed:"created" by created|slice:":-9" as news_list %}
+
+{% for elem in news_list %}
+    <h4>{{ elem.grouper }}</h4>
+    <ul>
+        {% for el in elem.list %}
+      <li><a href="{% url 'article' el.link %}">{{ el.title }}</a></li>
+        {% endfor %}
+    </ul>
+{% endfor %}
+<a href="{% url 'post_news' %}">Create News</a>
+
+{{ block.super }} <!-- Расширяет блок новой инфой не портя другой шаблонный блок. -->
+
+{% endblock %}

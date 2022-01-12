@@ -1,0 +1,10 @@
+{% extends "news/base.html" %}
+
+{% block title %}{{ current_news.title }}{% endblock %}
+{% block head %}{{ block.super }} {{ current_news.title }}{% endblock %}
+{% block content %}
+    <p>
+    {{ current_news.created }}</p>
+    <p>{{ current_news.text }}</p>
+    <a href="{% url 'news_page' %}">Main Page</a>
+{% endblock %}

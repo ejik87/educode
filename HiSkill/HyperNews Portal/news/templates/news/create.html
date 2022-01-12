@@ -1,0 +1,19 @@
+{% extends "./base.html" %}
+
+{% block title %}Create News{% endblock %}
+{% block head %}{{ block.super }}{% endblock %}
+{% block content %}
+<form action="{% url 'post_news' %}" method="POST">{% csrf_token %}
+    <p>Title News:
+    <label>
+        <input type="text" name="title" autofocus>
+    </label></p>
+    <p>Article:
+    <label>
+        <input size="24" type="text" name="text">
+    </label></p>
+    <button type="submit">Post news</button>
+</form>
+<br>
+<a href="{% url 'news_page' %}">News page</a>
+{% endblock %}
