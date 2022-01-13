@@ -1,7 +1,4 @@
-// Lab.cpp: определяет точку входа для консольного приложения.
-//
 
-#include "stdafx.h"
 #include <iostream>
 #include <math.h>
 #include <float.h>
@@ -11,18 +8,12 @@ using namespace std;
 
 float Y(float a, float b, float c, float x)
 {
-//	float a,b,c,x;
-//	cout << "Enter a b c x:";
-//	cin >> a >> b >> c >> x;
 	return (pow(a, 3) * x - cos(x)) / (x +b * c);
 };
 
 
 float Z(float a, float b, float c, float x)
 {
-//	float a,b,c,x;
-//	cout << "Enter a b c x:";
-//	cin >> a >> b >> c >> x;
 	return -pow(10., -2) * ((b*c)/x) * pow(cos(x), 2) * sqrt(pow(a, 3) * x);
 };
 
@@ -47,7 +38,7 @@ int main()
 		cout << "Arguments non equel null";
 	}
 
-system("pause");
+//system("pause");
 return 0;
 };
 
