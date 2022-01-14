@@ -1,7 +1,9 @@
 #include <iostream> // подключение: библиотека для консольного ввода/вывода
 #include <cmath>
 #include <iomanip> // манипуляторы выравнивания текста
+
 using namespace std;
+
 int main()
 {
     float a, b, h;
