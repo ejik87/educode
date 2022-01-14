@@ -20,7 +20,7 @@ void print_head(string head)
 void print_table(int x, float y)
 {   // Немного форматирования по левому краю, затем сброс форматирования -> прижимает к правому краю и округляем до 5 символов в общем.
     cout << setiosflags(ios::left) << setw(5)  << x << resetiosflags(ios::left)  << setprecision(5) << setw(10) << y << endl;
-}
+};
 
 void cicle_func(float a, float b, float h, int key)
 {
