@@ -7,52 +7,60 @@
 
 using namespace std;
 
+void print_head(string head)
+{
+    cout.width(15);  // Устанавливаем ширину вывода жестко.
+    cout << '\n' << head << '\n' << endl;  // для переноса строк используем спец символы.
+    cout << setiosflags(ios::left) << setw(5)  << "X" << resetiosflags(ios::left)  << setw(10) << "Y" << endl;
+    //cout << "  X   |     Y  " << endl;
+    //cout.fill('.');  // Заполняет пробелы символами из скобок.
+    cout << "_______________" << "\n" << endl;
+};
+
+void print_table(int x, float y)
+{   // Немного форматирования по левому краю, затем сброс форматирования -> прижимает к правому краю и округляем до 5 символов в общем.
+    cout << setiosflags(ios::left) << setw(5)  << x << resetiosflags(ios::left)  << setprecision(5) << setw(10) << y << endl;
+}
+
 void cicle_func(float a, float b, float h, int key)
 {
     switch(key)
     {
     case 1: {
-        cout << " " << endl;
-        cout << "Cicle FOR" << endl;
-        cout << " " << endl;
-        cout << "  X   |     Y  " << endl;
-        cout << "_______________"<< endl;
+        string head = "Cicle For";
+        print_head(head);
         float x, y;
         for (x = a; x <= b; x += h)
         {
             y = pow(x, 3.)*cos(x + 3.);
-            cout << setw(4) << x << "  " << setw(7) << setprecision(4) << y << endl;
+            //cout << setw(4) << x << "  " << setw(7) << setprecision(4) << y << endl;  // старый варик
+            print_table(x,y);
+
         }
     break;};
 
     case 2: {
-        cout << " " << endl;
-        cout << "Cicle While" << endl;
-        cout << " " << endl;
-        cout << "  X   |     Y  " << endl;
-        cout << "_______________"<< endl;
+        string head = "Cicle While";
+        print_head(head);
         float x, y;
         x = a;
         while (x <= b)
         {
             y = pow(x, 3.)*cos(x + 3.);
-            cout << setw(4) << x << "  " << setw(7) << setprecision(4) << y << endl;
+            print_table(x,y);
             x += h;
         }
     break;};
 
     case 3:{
-        cout << " " << endl;
-        cout << "Cicle Do While" << endl;
-        cout << " " << endl;
-        cout << "  X   |     Y  " << endl;
-        cout << "_______________"<< endl;
+        string head = "Cicle Do While";
+        print_head(head);
         float x, y;
         x = a;
         do
         {
             y = pow(x, 3.)*cos(x + 3.);
-            cout << setw(4) << x << "  " << setw(7) << setprecision(4) << y << endl;
+            print_table(x,y);
             x += h;
         } while (x <= b);
     break;};
