@@ -1,13 +1,17 @@
+// Лекции зимней сессии 01.2022г.
+
 #include <iostream>
-#include <math.h>
+//#include <math.h>
 #include <float.h>
-#include <iomanip>
+//#include <iomanip>
 
 using namespace std;
 
 //методичка страница 91
 
-int main()
+// Массив
+
+int main() 
 {
 
     int A[100];
@@ -19,6 +23,6 @@ int main()
         cout << "Enter A[" << i << "] =";
         cin >> A[i];
     };
-system("pause");
+//system("pause");
 return 0;
 }
