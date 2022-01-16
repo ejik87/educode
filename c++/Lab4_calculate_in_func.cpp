@@ -6,7 +6,7 @@ using namespace std;
 
 float Y(float a, float b, float c, float x)
 {
-	return (pow(a, 3) * x - cos(x)) / (x +b * c);
+	return (pow(a, 3) * x - cos(x)) / (x + b * c);
 };
 
 
@@ -20,7 +20,7 @@ int main()
 	float a,b,c,x;
 	cout << "Enter a b c x:";
 	cin >> a >> b >> c >> x;
-	if (x != 0 && pow(a, 3) * x >= 0 && (x +b * c) != 0)
+	if (c != 0 && a > 0 && x > 0 && b != 0)
 	{
 	float y = Y(a,b,c,x);
 	float z = Z(a,b,c,x);
