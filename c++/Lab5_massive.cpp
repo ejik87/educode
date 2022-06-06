@@ -35,7 +35,7 @@ void positive_sum(int AA[], int n)
             sum += AA[i];
         }
     }
-    cout << "Summ positive and chetn nums = " << sum << endl;
+    cout << "Summ positive and even nums = " << sum << endl;
 }
 
 int main()
