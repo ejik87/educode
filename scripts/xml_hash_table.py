@@ -14,9 +14,27 @@ def parseXML(xmlFile):
         'RTCX.EXE',
         'USER.TMSD',
         'USER_16.TMSD',
-        'UP'
-        'RTP',
-        'CNV',
+        '.UP'
+        '.RTP',
+        '.CNV',
+        '.DBB',
+        'MPS.EXE',
+        'PCOMM.DLL',
+        'INSATHDASVR.DLL',
+        'VIEWX.EXE',
+        'VIEWXCORE.DLL',
+        'SCXCMD.EXE',
+        'SERVERCONFIG.EXE',
+        'DBCLIENT.DLL',
+        'DBKERNEL.DLL',
+        'OBJECTS.CL',
+        'OELITE.CFG',
+        'SQLC.CFG',
+        'WINCCEXPLORER.EXE',
+        'WINCCCONFIGURATOR.EXE',
+        'DB.DLL',
+        'WINCC50.DLL',
+        'WINCC50X64.DLL'
     )
 
     tree = etree.parse(xmlFile)  # Читаем из XML файла инфу
