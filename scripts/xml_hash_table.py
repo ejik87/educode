@@ -1,8 +1,8 @@
 import docx
-from docx.shared import Inches, Cm, Pt, RGBColor
-from docx.enum.table import WD_TABLE_ALIGNMENT
+from docx.shared import Inches, Cm, Pt
+# from docx.enum.table import WD_TABLE_ALIGNMENT
 from lxml import etree
-from os import getcwd, listdir, path, walk
+from os import getcwd, path, walk
 
 
 def parseXML(xmlFile):
@@ -34,7 +34,9 @@ def parseXML(xmlFile):
         'WINCCCONFIGURATOR.EXE',
         'DB.DLL',
         'WINCC50.DLL',
-        'WINCC50X64.DLL'
+        'WINCC50X64.DLL',
+        'АРМ УЗРГ.exe',
+        'АРМ УЗРГ.vshost.exe'
     )
 
     tree = etree.parse(xmlFile)  # Читаем из XML файла инфу
@@ -52,14 +54,14 @@ def parseXML(xmlFile):
     return file_hash_dict
 
 
-def doc_file():
-    paths = []
-    folder = getcwd()
-    for root, dirs, files in walk(folder):
-        for file in files:
-            if file.endswith('docx') and not file.startswith('~'):
-                paths.append(path.join(root, file))
-    return paths
+# def doc_file():
+#     files_list = []
+#     path_folder = getcwd()
+#     for root, dirs, files in walk(path_folder):
+#         for file in files:
+#             if file.endswith('docx') and not file.startswith('~'):
+#                 files_list.append(path.join(root, file))
+#     return files_list
 
 
 # def show_doc(paths):
@@ -100,11 +102,12 @@ def get_hash_files(dir_path):
     for address, dirs, files in walk(dir_path):
         for name in files:
             if name.endswith('.xml') and name.startswith(('ia', 'po')):
-                file_list.append(name)
+                file_list.append(path.join(address, name))
     return file_list
 
 
-def parse_hosts(names):
+def parse_hosts(file_path):
+    names = [file.split('/')[-1] for file in file_path]
     hosts = []
     for host in names:
         if host.endswith('.xml') and host.startswith(('ia', 'po')):
@@ -138,17 +141,14 @@ def parse_hosts(names):
 #     return table
 
 
-def doc_build(docx_file='', files_path=''):
-    if files_path == '':
-        files_path = getcwd()
+def doc_build(docx_file='', files_path=getcwd()):
     if docx_file == '':
         document = docx.Document()
         docx_file = "Таблица хешей.docx"
+    document = docx.Document(docx=docx_file)  # Открываем файл для добавления таблиц
     '''
     ======= Начинаем наполнение файла docx. ========
     '''
-    document = docx.Document(docx=docx_file)  # Открываем файл для добавления таблиц
-
     # создаем пустую таблицу
     # если сразу создать таблицу, ее ширина потом не устанавливается из-за бага:
     # https://github.com/python-openxml/python-docx/issues/315
@@ -177,13 +177,16 @@ def doc_build(docx_file='', files_path=''):
     }
 
     for hostname in hostnames:  # Цикл создания таблиц
+        ''' Фильтруем имена хэш-файлов по имени хоста'''
+        file_from_hostname = [filename for filename in hash_files if hostname == filename[filename.find('hashes-') + 7:].rstrip('.xml')]
         rows = []
-        # headers = (
-        #     (f'Наименование ТС: {hostname}', '', '', ''),
-        #     ('Используемый алгоритм подсчёта значений контрольный сумм: SHA1', '', '', ''),
-        #     ('№', 'Имя файла / идентификатор объекта (если не файл)', 'Место размещения', 'Значение контрольной суммы'),
-        # )
-        header = ('№', 'Имя файла / идентификатор объекта (если не файл)', 'Место размещения', 'Значение контрольной суммы')
+
+        header = (
+            '№',
+            'Имя файла / идентификатор объекта (если не файл)',
+            'Место размещения',
+            'Значение контрольной суммы'
+        )
 
         table = document.add_table(rows=1, cols=4)
         table.style = 'Table Grid'
@@ -205,30 +208,31 @@ def doc_build(docx_file='', files_path=''):
 
         type_flag = ''
         row_number = 1
-        for hash_file in hash_files:
-            if hostname == hash_file[hash_file.find('hashes-') + 7:].rstrip('.xml'):
-                try:
-                    hashes_dict = parseXML(hash_file)
-                    if hashes_dict:
-                        type_comp = type_dir[hash_file[:2]]  # отделяем символы типа содержимого файла (io, po)
-                        if type_comp != type_flag:
-                            type_flag = type_comp
-                            row_number = 1
-                            # Добавляем разделитель-шапку
-                            row_cells = table.add_row().cells
-                            row_cells[0].merge(row_cells[-1])
-                            row_cells[0].text = str(f'Наименование подсистемы / компонента: {type_comp}')
+        for hash_file in file_from_hostname:
+            # if hostname == hash_file[hash_file.find('hashes-') + 7:].rstrip('.xml'):
+            try:
+                hashes_dict = parseXML(hash_file)
+                if hashes_dict:
+                    type_comp = type_dir[hash_file.split('/')[-1][:2]]  # отделяем символы типа содержимого файла (io, po)
+                    if type_comp != type_flag:
+                        type_flag = type_comp
+                        row_number = 1
+                        # Добавляем разделитель-шапку
+                        row_cells = table.add_row().cells
+                        row_cells[0].merge(row_cells[-1])
+                        row_cells[0].text = str(f'Наименование подсистемы / компонента: {type_comp}')
 
-                        # Заполняем табличку данными
-                        rows = ([(n, i[0], i[1][0], i[1][1]) for n, i in enumerate(hashes_dict.items(), row_number)])  # Достаём итемы из словаря, имя файла:[путь, хэш]
-                        for row in rows:
-                            row_cells = table.add_row().cells
-                            for i in range(4):
-                                row_cells[i].text = str(row[i])
-                        row_number += len(rows)
+                    '''# Заполняем табличку данными'''
+                    # Достаём итемы из словаря, имя файла:[путь, хэш]
+                    rows = ([(n, i[0], i[1][0], i[1][1]) for n, i in enumerate(hashes_dict.items(), row_number)])
+                    for row in rows:
+                        row_cells = table.add_row().cells
+                        for i in range(4):
+                            row_cells[i].text = str(row[i])
+                    row_number += len(rows)
 
-                except OSError:
-                    print(OSError)
+            except OSError:
+                print(OSError)
         document.add_paragraph()
 
     # Тут пример цикла таблицы
@@ -244,3 +248,4 @@ def doc_build(docx_file='', files_path=''):
 
 if __name__ == '__main__':
     doc_build('документ по контролю целостности.docx')
+    
