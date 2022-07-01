@@ -35,8 +35,9 @@ def parseXML(xmlFile):
         'DB.DLL',
         'WINCC50.DLL',
         'WINCC50X64.DLL',
-        'АРМ УЗРГ.exe',
-        'АРМ УЗРГ.vshost.exe'
+        'АРМ УЗРГ.EXE',
+        'АРМ УЗРГ.VSHOST.EXE',
+        'MB_MONITOR.EXE'
     )
 
     tree = etree.parse(xmlFile)  # Читаем из XML файла инфу
@@ -49,7 +50,7 @@ def parseXML(xmlFile):
         # fff = file_name.split('.')[-1].upper()
         # if fff in file_types:
         if file_name.upper().endswith(file_types):
-            file_hash_dict[file_name] = [f.text.replace(file_name, ''), h.text] # Добавляем -> 'файл': ['SHA1 контрольную сумму', путь к файлу]
+            file_hash_dict[file_name] = [f.text.replace(file_name, ''), h.text]  # Добавляем -> 'файл': ['SHA1 контрольную сумму', путь к файлу]
 
     return file_hash_dict
 
@@ -248,4 +249,3 @@ def doc_build(docx_file='', files_path=getcwd()):
 
 if __name__ == '__main__':
     doc_build('документ по контролю целостности.docx')
-    
