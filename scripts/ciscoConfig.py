@@ -40,7 +40,7 @@ def cmd_exec(user, passwd, hosts):
             "password": passwd,
         }
         switch_connect = ConnectHandler(**cisco)  # считывание пары ключ-значение.
-        output = switch_connect.send_config_from_file('cisco_commands.txt')
+        output = switch_connect.send_config_from_file('cisco_commands.txt')  # отправка конфигурации из указанного файла
         # switch_connect.send_command()
         # output = switch_connect.send_config_set(commands)
 
@@ -48,9 +48,13 @@ def cmd_exec(user, passwd, hosts):
         print(output)
         print("--------- End ---------")
 
+        switch_connect.disconnect()  # Закрытие соединения.
         user_check = input('Press Enter for continue. Or type "Exit". ')
         if user_check:
             break
+            
+        # ios_config = switch_connect.save_config(f'{cisco["host"]}.ios')  # сохранить текущую конфигурацию в режиме startup - config;
+        # print(ios_config)
 
 
 if __name__ == "__main__":
