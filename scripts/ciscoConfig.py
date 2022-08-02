@@ -1,9 +1,12 @@
 from netmiko import ConnectHandler, NetmikoTimeoutException, NetmikoAuthenticationException
+from paramiko.ssh_exception import SSHException
 from getpass import getpass
 from os import mkdir, path
 
 auth_filename = 'auth.txt'  # Файл с аутентификационными данными
 hosts_filename = 'hosts.txt'  # Имя файла с перечнем IP адресов целевых коммутаторов.
+
+
 # cmd_filename = 'commands.txt'
 
 
@@ -20,6 +23,9 @@ def print_banner():
 
 
 def get_config(ssh, command='sh run'):
+    """
+    # Функция получения многостраничного вывода
+    """
     # ssh.enable()
     prompt = ssh.find_prompt()
     ssh.send_command("terminal length 100")
@@ -62,18 +68,10 @@ def main():
     cmd_exec(usr, passwd, sw)
 
 
-'''
-# Функция получения многостраничного вывода
-'''
-
-
-
-'''
-# Функция выполнения запросов к устройстсву
-'''
-
-
 def cmd_exec(user, passwd, hosts):
+    """
+    # Функция выполнения запросов к устройстсву
+    """
     for host in hosts:
         if not host or host[0] in '!#':  # Если попалась пустая строка или #, пропуск.
             continue
@@ -91,33 +89,44 @@ def cmd_exec(user, passwd, hosts):
         }
         try:
             switch_connect = ConnectHandler(**cisco)  # считывание пары ключ-значение.
-            switch_connect.enable()  # Перейти в режим enable
-            prompt = switch_connect.find_prompt().rstrip('#')
+        except NetmikoAuthenticationException as error:
+            print('========ERROR=========', '\nНеверные данные аутентификации: ' + host)
+            print(error, '=========END=========\n')
+            continue
+        except NetmikoTimeoutException as error:
+            print('========ERROR=========', '\nНет ответа от устройства: ' + host)
+            print(error, '=========END=========\n')
+            continue
+        except SSHException as error:
+            print('========ERROR=========', '\nSSH недоступен. Проверьте включен ли SSH? ' + host)
+            print(error, '=========END=========\n')
+            continue
 
-            if not path.exists('./backup_cfg/'):
-                mkdir('backup_cfg')
-            with open(f'./backup_cfg/{prompt}_backup.ios', 'w') as backup_cfg:
-                print(f'----------- Save backUp configuration ------------\n ./backup_cfg/{prompt}_backup.ios')
-                backup_cfg.write(get_config(switch_connect, 'sh run'))  # Сохраняем конфигу перед изменениями.
-                print('----------- End save backUp configuration ------------')
+        switch_connect.enable()  # Перейти в режим enable
+        prompt = switch_connect.find_prompt().rstrip('#')
 
-            output = switch_connect.send_config_from_file('commands.txt')  # отправка конфигурации из указанного файла
-            # switch_connect.send_command()
-            # output = switch_connect.send_config_set(commands)
-            print(f"\n\n--------- Device {cisco['host']} ---------")
-            print(output)  # Вывести результаты выполнения команд
-            print("--------- End ---------")
+        if not path.exists('./backup_cfg/'):
+            mkdir('backup_cfg')
+        with open(f'./backup_cfg/{prompt}_backup.ios', 'w') as backup_cfg:
+            print(f'----------- Save backUp configuration ------------\n| ./backup_cfg/{prompt}_backup.ios')
+            backup_cfg.write(get_config(switch_connect, 'sh run'))  # Сохраняем конфигу перед изменениями.
+            print('----------- End save backUp configuration ------------')
 
-            if not path.exists('./new_cfg/'):
-                mkdir('new_cfg')
-            with open(f'./new_cfg/{prompt}.ios', 'w') as new_cfg:
-                print(f'----------- Save New configuration ------------\n ./new_cfg/{prompt}.ios')
-                new_cfg.write(get_config(switch_connect, 'sh run'))  # Сохраняем конфигу после изменений.
-                print('----------- End save New configuration ------------')
+        output = switch_connect.send_config_from_file('commands.txt')  # отправка конфигурации из указанного файла
+        # switch_connect.send_command()
+        # output = switch_connect.send_config_set(commands)
+        print(f"\n\n--------- Device {cisco['host']} ---------")
+        print(output)  # Вывести результаты выполнения команд
+        print("--------- End ---------")
 
-            switch_connect.disconnect()  # Закрытие соединения.
-        except (NetmikoTimeoutException, NetmikoAuthenticationException) as error:
-            print('\nERROR:', error, '========END=========\n')
+        if not path.exists('./new_cfg/'):
+            mkdir('new_cfg')
+        with open(f'./new_cfg/{prompt}.ios', 'w') as new_cfg:
+            print(f'----------- Save New configuration ------------\n| ./new_cfg/{prompt}.ios')
+            new_cfg.write(get_config(switch_connect, 'sh run'))  # Сохраняем конфигу после изменений.
+            print('----------- End save New configuration ------------')
+
+        switch_connect.disconnect()  # Закрытие соединения.
 
         user_check = input('Press Enter for continue. Or type "Exit". ')
         if user_check:
