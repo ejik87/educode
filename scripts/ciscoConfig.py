@@ -4,12 +4,42 @@ from os import mkdir, path
 
 auth_filename = 'auth.txt'  # Файл с аутентификационными данными
 hosts_filename = 'hosts.txt'  # Имя файла с перечнем IP адресов целевых коммутаторов.
-
-
 # cmd_filename = 'commands.txt'
 
 
+def print_banner():
+    print('''
+    -----------------------------------------------------------------------
+    |                   Cisco automation configurator                     |
+    |                      You can use config files                       |
+    |            Credentials: user and password; auth.txt file            |
+    |                 IP of target devices; hosts.txt file                |
+    |          Device configuration commands; commands.txt file           |
+    |_____________________________________________________________________|
+    ''')
+
+
+def get_config(ssh, command='sh run'):
+    # ssh.enable()
+    prompt = ssh.find_prompt()
+    ssh.send_command("terminal length 100")
+    ssh.write_channel(f"{command}\n")
+    output = ""
+    while True:
+        try:
+            page = ssh.read_until_pattern(f"More|{prompt}")
+            output += page[:page.rfind('--More--')]  # Отфильтруем конец страницы
+            if "More" in page:
+                ssh.write_channel(" ")
+            elif prompt in output:
+                break
+        except NetmikoTimeoutException:
+            break
+    return output
+
+
 def main():
+    print_banner()
     try:
         with open(auth_filename, 'r') as auth_file:
             usr, passwd = auth_file.read().splitlines()
@@ -36,24 +66,6 @@ def main():
 # Функция получения многостраничного вывода
 '''
 
-
-def get_config(ssh, command='sh run'):
-    # ssh.enable()
-    prompt = ssh.find_prompt()
-    ssh.send_command("terminal length 100")
-    ssh.write_channel(f"{command}\n")
-    output = ""
-    while True:
-        try:
-            page = ssh.read_until_pattern(f"More|{prompt}")
-            output += page[:page.rfind('--More--')]  # Отфильтруем конец страницы
-            if "More" in page:
-                ssh.write_channel(" ")
-            elif prompt in output:
-                break
-        except NetmikoTimeoutException:
-            break
-    return output
 
 
 '''
