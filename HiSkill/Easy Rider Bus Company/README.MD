@@ -16,8 +16,8 @@ If you cannot find the necessary information in the stage description, it can pr
 Example 1
 
 Input 1:
-
-`[
+```python
+[
     {
         "bus_id": 128,
         "stop_id": 1,
@@ -98,15 +98,16 @@ Input 1:
         "stop_type": "F",
         "a_time": "08:16"
     }
-]`
+]```
 Output 1:
-`
+```shell
 On demand stops test:
-Wrong stop type: ['Elm Street', 'Sunset Boulevard']`
+Wrong stop type: ['Elm Street', 'Sunset Boulevard']
+```
 Example 2
 
 Input 2:
-`
+```shell
 [
     {
         "bus_id": 512,
@@ -124,8 +125,9 @@ Input 2:
         "stop_type": "F",
         "a_time": "08:16"
     }
-]`
+]```
 Output 2:
-`
+```shell
 On demand stops test:
-OK`
+OK
+```
