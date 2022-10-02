@@ -17,7 +17,7 @@ Example 1
 
 Input 1:
 
-```[
+`[
     {
         "bus_id": 128,
         "stop_id": 1,
@@ -98,15 +98,15 @@ Input 1:
         "stop_type": "F",
         "a_time": "08:16"
     }
-]```
+]`
 Output 1:
-```
+`
 On demand stops test:
-Wrong stop type: ['Elm Street', 'Sunset Boulevard']```
+Wrong stop type: ['Elm Street', 'Sunset Boulevard']`
 Example 2
 
 Input 2:
-```
+`
 [
     {
         "bus_id": 512,
@@ -124,8 +124,8 @@ Input 2:
         "stop_type": "F",
         "a_time": "08:16"
     }
-]```
+]`
 Output 2:
-```
+`
 On demand stops test:
-OK```
+OK`
