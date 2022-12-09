@@ -11,7 +11,7 @@ def main_menu():
     btn1 = types.InlineKeyboardButton("О нас", callback_data='about')
     btn2 = types.InlineKeyboardButton("Список услуг", callback_data='services')
     btn3 = types.InlineKeyboardButton("Мои заказы", callback_data='orders')
-    btn4 = types.InlineKeyboardButton("Поддержка", callback_data='support')
+    btn4 = types.InlineKeyboardButton("Поддержка", callback_data='support', url=config.support_url)
     markup.add(btn1, btn2, btn3, btn4)
     return markup
 
@@ -19,11 +19,20 @@ def main_menu():
 def services_menu():
     markup = types.InlineKeyboardMarkup()
     btn1 = types.InlineKeyboardButton("Примерка", callback_data='serv_1')
-    btn2 = types.InlineKeyboardButton("Закупки", callback_data='serv2')
-    btn3 = types.InlineKeyboardButton("Всякое разное", callback_data='serv3')
-    btn4 = types.InlineKeyboardButton("И многое другое", callback_data='serv4')
+    btn2 = types.InlineKeyboardButton("Закупки", callback_data='serv_2')
+    btn3 = types.InlineKeyboardButton("Всякое разное", callback_data='serv_3')
+    btn4 = types.InlineKeyboardButton("И многое другое", callback_data='serv_4')
     btn5 = types.InlineKeyboardButton("Назад в главное меню", callback_data='main')
     markup.add(btn1, btn2, btn3, btn4, btn5)
+    return markup
+
+
+def service_menu():
+    markup = types.InlineKeyboardMarkup()
+    btn1 = types.InlineKeyboardButton("Условия", callback_data='terms')
+    btn2 = types.InlineKeyboardButton("Оформление заказа", callback_data='order')
+    btn3 = types.InlineKeyboardButton("Назад в главное меню", callback_data='main')
+    markup.add(btn1, btn2, btn3)
     return markup
 
 
@@ -50,9 +59,9 @@ def welcome(message):
 
 @bot.message_handler(content_types=['text'])  # Ответы на текстовые сообщения
 def respond_foo(message):
-    if message.chat.type == 'ptivate':
-        if message.text == 'Ответ1':
-            bot.send_message(message.chat.id, str(1))
+    if message.chat.type == 'private':
+        if message.text.lower() == 'привет':
+            bot.send_message(message.chat.id, 'Вот тебе ответ!')
     else:
         bot.send_message(message.chat.id, 'Я не знаю что ответить 😢')
 
@@ -77,37 +86,31 @@ def callback_inline_menu(call):
                     bot.answer_callback_query(callback_query_id=call.id, show_alert=False, text="Ваши данные загружаются...")
                     bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                           text="Вот история ваших заказов", reply_markup=main_menu())
-                case 'support':
-                    # bot.send_message(call.message.chat.id, 'ТЫ выбрал меню №4 😊')
-                    bot.delete_message(chat_id=call.message.chat.id,
-                                       message_id=call.message.message_id)  # Удаляем сообщюху с меню
-                    # bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                    #                       text="Выбери какую функцию мне выполнить",
-                    #                       reply_markup=None)
-                    bot.get_chat(config.chat_id)
                 case 'serv_1':
-                    print(call.message.chat.id)
-                    print(call.message.message_id)
-                    bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                          text="1", reply_markup=back_menu())
-                    bot.answer_callback_query(callback_query_id=call.id, show_alert=False, text="Кнопка1 работает...")
+                    bot.send_message(call.message.chat.id, text='Примерка', reply_markup=service_menu())
+                    # bot.answer_callback_query(callback_query_id=call.id, show_alert=False, text="Кнопка1 работает...")
                 case 'serv_2':
-                    bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                          text="2", reply_markup=back_menu())
-                    bot.answer_callback_query(callback_query_id=call.id, show_alert=False, text="Кнопка2 работает...")
+                    bot.send_message(call.message.chat.id, text='Закупки', reply_markup=service_menu())
+                    # bot.answer_callback_query(callback_query_id=call.id, show_alert=False, text="Кнопка2 работает...")
                 case 'serv_3':
-                    bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                          text="3", reply_markup=back_menu())
-                    bot.answer_callback_query(callback_query_id=call.id, show_alert=False, text="Кнопка3 работает...")
+                    bot.send_message(call.message.chat.id, text='Всякое разное', reply_markup=service_menu())
+                    # bot.answer_callback_query(callback_query_id=call.id, show_alert=False, text="Кнопка3 работает...")
                 case 'serv_4':
+                    bot.send_message(call.message.chat.id, text='И многое другое', reply_markup=service_menu())
+                case 'terms':
                     bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                          text="4", reply_markup=back_menu())
-                    bot.answer_callback_query(callback_query_id=call.id, show_alert=False, text="Кнопка4 работает...")
+                                          text='Инфо из списка ' + call.data, reply_markup=service_menu())
+                case 'order':
+                    bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                          text='Инфо из списка ' + call.data, reply_markup=service_menu())
                 case 'main':
                     bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                           text='Главное меню', reply_markup=main_menu())
                 case _:
                     pass
+
+            #     bot.delete_message(chat_id=call.message.chat.id,
+            #                        message_id=call.message.message_id)  # Удаляем сообщюху с меню
             #  Удаляем inline клавиатуру меню
             # bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
             #                       text="Выбери какую функцию мне выполнить",
