@@ -1,3 +1,12 @@
+from geopy import geocoders
+
+def geo_pos(city: str):
+    geolocator = geocoders.Nominatim(user_agent="telebot")
+    latitude = str(geolocator.geocode(city).latitude)
+    longitude = str(geolocator.geocode(city).longitude)
+    return latitude, longitude
+
+
 dp.message_handler()
 async def get_weather(message: types.Message):
     code_to_smie = {
@@ -9,6 +18,19 @@ async def get_weather(message: types.Message):
         "Snow": "Снег \U0001F328",
         "Mist": "Туман \U0001F32B"
     }
+    
+    # От яндекса
+    wind_dir = {'nw': 'северо-западное', 'n': 'северное', 'ne': 'северо-восточное', 'e': 'восточное',
+                'se': 'юго-восточное', 's': 'южное', 'sw': 'юго-западное', 'w': 'западное', 'с': 'штиль'
+               }
+    conditions = {'clear': 'ясно', 'partly-cloudy': 'малооблачно', 'cloudy': 'облачно с прояснениями',
+                  'overcast': 'пасмурно', 'drizzle': 'морось', 'light-rain': 'небольшой дождь',
+                  'rain': 'дождь', 'moderate-rain': 'умеренно сильный', 'heavy-rain': 'сильный дождь',
+                  'continuous-heavy-rain': 'длительный сильный дождь', 'showers': 'ливень',
+                  'wet-snow': 'дождь со снегом', 'light-snow': 'небольшой снег', 'snow': 'снег',
+                  'snow-showers': 'снегопад', 'hail': 'град', 'thunderstorm': 'гроза',
+                  'thunderstorm-with-rain': 'дождь с грозой', 'thunderstorm-with-hail': 'гроза с градом'
+                 }
 
     try:
         r = requests.get(
